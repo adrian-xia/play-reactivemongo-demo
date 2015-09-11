@@ -32,7 +32,7 @@ html,body {
 	position: absolute;
 	top: 50%;
 
-	margin-top: -300px;
+	margin-top: -250px;
 	/*设置负值，为要定位子盒子的一半高度*/
 	
 }
@@ -65,7 +65,7 @@ html,body {
 }
 
 .regist-content {
-	height: 500px;
+	height: 400px;
 	width: 100%;
 	max-width:500px;
 	background-color: rgba(255, 250, 2550, .6);
