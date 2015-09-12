@@ -56,22 +56,51 @@ class Users @Inject()(
   /**
    * 登陆方法
    */
-  def loginSubmit = TODO
+  def loginSubmit = Action.async { implicit request =>
+    implicit val messages = messagesApi.preferred(request)
+
+    LoginForm.form.bindFromRequest.fold(
+      errors => Future.successful(
+        Ok(views.html.login(errors))),
+
+      loginForm => {
+        
+        val tempUser = collection.find(Json.obj("username" -> loginForm.username,"password" -> loginForm.password)).one[User]
+        for{
+          maybeUser <- tempUser
+          result <- maybeUser.map { user =>
+            gridFS.find[JsObject, JSONReadFile](
+              Json.obj("user" -> user.id.get)).collect[List]().map { files =>
+              
+              implicit val messages = messagesApi.preferred(request)
+              
+              Redirect(routes.Users.listUsers).withSession("JSONID" -> Json.stringify(Json.toJson(user.id)) )
+            }
+          }.getOrElse(Future.successful(Redirect(routes.Users.showLoginPage)))
+        } yield result
+        
+      })
+  }
   /**
    * 展示所有用户列表
    */
   def listUsers = Action.async { implicit request =>
-    
-    val query = Json.obj("$query" -> Json.obj())
-
-    val found = collection.find(query).cursor[User]
-    
-    found.collect[List]().map { users =>
-      Ok(views.html.listUsers(users))
-    }.recover {
-      case e =>
-        e.printStackTrace()
-        BadRequest(e.getMessage())
+    implicit val messages = messagesApi.preferred(request)
+    request.session.get("JSONID").map{ tempUUID =>
+      println(tempUUID)
+      val query = Json.obj("$query" -> Json.obj())
+      
+      val found = collection.find(query).cursor[User]
+      
+      found.collect[List]().map { users =>
+        Ok(views.html.listUsers(users))
+      }.recover {
+        case e =>
+          e.printStackTrace()
+          BadRequest(e.getMessage())
+      }
+    }.getOrElse{
+      Future.successful(Redirect(routes.Users.showLoginPage))
     }
   }
   /**
@@ -80,7 +109,7 @@ class Users @Inject()(
   def showRegistPage = Action { request =>
     implicit val messages = messagesApi.preferred(request)
 
-    Ok(views.html.regist(null, User.form))
+    Ok(views.html.regist(None, User.form))
   }
   /**
    * 注册方法，保存用户
@@ -90,7 +119,7 @@ class Users @Inject()(
     
     User.form.bindFromRequest.fold(
       errors => Future.successful(
-        Ok(views.html.regist(null, errors))),
+        Ok(views.html.regist(None, errors))),
 
       // 没有验证错误，插入注册用户
       user => collection.insert(user.copy(
@@ -134,6 +163,40 @@ class Users @Inject()(
         }
       }.getOrElse(Future(NotFound))
     } yield result
+  }
+  
+  /**
+   * 保存提交
+   */
+  def editSubmit(id: String) = Action.async { implicit request =>
+    implicit val messages = messagesApi.preferred(request)
+
+    User.form.bindFromRequest.fold(
+      errors => Future.successful(
+        Ok(views.html.regist(Some(id), errors))),
+
+      user => {
+        val modifier = Json.obj(
+          //设置更新属性
+          "$set" -> Json.obj(
+            "updatetime" -> Some(new DateTime()),
+            "username" -> user.username,
+            "password" -> user.password,
+            "email" -> user.email))
+
+        // 此处进行更新
+        collection.update(Json.obj("_id" -> id), modifier).
+          map { _ => Redirect(routes.Users.listUsers) }
+      })
+  }
+  
+  /**
+   * 登出
+   */
+  def logout = Action { request =>
+    implicit val messages = messagesApi.preferred(request)
+
+    Redirect(routes.Users.showLoginPage).withNewSession
   }
   
 }

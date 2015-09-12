@@ -10,7 +10,8 @@ GET     /users/regist               controllers.Users.showRegistPage
 POST	/users/registsubmit			controllers.Users.registSubmit
 DELETE  /users/:id           		controllers.Users.deleteUser(id)
 GET     /users/:id              	controllers.Users.showEditPage(id)
-
+POST    /articles/:id               controllers.Users.editSubmit(id)
+GET		/user/logout				controllers.Users.logout
 
 
 

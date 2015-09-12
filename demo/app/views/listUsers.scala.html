@@ -1,9 +1,7 @@
 @(users: List[models.User])
 
-@main("Welcome to Play 2.0") {
+@main("用户列表") {
 	
-<script src="@routes.Assets.versioned("javascripts/main.js")" type="text/javascript"></script>
-
 <style type="text/css">
 table.gridtable {
 	font-family: verdana,arial,sans-serif;
@@ -35,28 +33,35 @@ table.gridtable td {
 <div class="box">
 	<h1 class="title-content" align="center">用户列表</h1>
 	<div class="login-box">
-			@if(users.isEmpty) {
-	        <p>当前没有任何用户.</p>
-			} else {
-				<table align="center" class="gridtable">
+		@if(users.isEmpty) {
+        <p>当前没有任何用户.</p>
+		} else {
+			<table align="center" class="gridtable">
+			<tr>
+				<th>用户名</th>
+				<th>email</th>
+				<th>最后修改时间</th>
+				<th>编辑</th>
+				<th>删除</th>
+			</tr>
+			@users.map { user =>
 				<tr>
-					<th>用户名</th>
-					<th>email</th>
-					<th>最后修改时间</th>
-					<th>编辑</th>
-					<th>删除</th>
+					<td>@user.username</td>
+					<td>@user.email</td>
+					<td>@user.updatetime.map(u => org.joda.time.format.DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss").print(u)).orElse(Some("n/a"))</td>
+					<td><a href="@routes.Users.showEditPage(user.id.get)" class="edit">编辑</a></td>
+					<td><a href="@routes.Users.deleteUser(user.id.get)" class="delete">删除</a></td>
 				</tr>
-				@users.map { user =>
-					<tr>
-						<td>@user.username</td>
-						<td>@user.email</td>
-						<td>@user.updatetime.map(u => org.joda.time.format.DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss").print(u)).orElse(Some("n/a"))</td>
-						<td><a href="@routes.Users.showEditPage(user.id.get)" class="edit">编辑</a></td>
-						<td><a href="@routes.Users.deleteUser(user.id.get)" class="delete">删除</a></td>
-					</tr>
-				}
-				</table>
-		    }
+			}
+			</table>
+	    }
+	    <br>
+	    <br>
+		<div class="form-group form-actions">
+			<div class="col-xs-4 col-xs-offset-4 ">
+				<button id="logoutbtn" class="btn btn-sm btn-info"><span class="glyphicon glyphicon-off"></span>登出</button>
+			</div>
+		</div>
 	</div>
 </div>
 }
