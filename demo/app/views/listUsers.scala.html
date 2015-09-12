@@ -1,22 +1,60 @@
 @(users: List[models.User])
 
 @main("Welcome to Play 2.0") {
-  <div class="row">
-    <div class="span12">
-      <h2>Available articles</h2>
+	
+<style type="text/css">
+table.gridtable {
+	font-family: verdana,arial,sans-serif;
+	font-size:11px;
+	color:#333333;
+	border-width: 1px;
+	border-color: #666666;
+	border-collapse: collapse;
+}
+table.gridtable th {
+	border-width: 1px;
+	padding: 8px;
+	border-style: solid;
+	border-color: #666666;
+	background-color: #dedede;
+}
+table.gridtable td {
+	border-width: 1px;
+	padding: 8px;
+	border-style: solid;
+	border-color: #666666;
+	background-color: #ffffff;
+}
 
-      @if(users.isEmpty) {
-        <p>当前没有任何用户.</p>
-      } else {
-      <ul>
-      @users.map { user =>
-        <li><a href="#">@user.username</a> <em>by @user.email</em> (last modified : @user.updatetime.map(u => org.joda.time.format.DateTimeFormat.forPattern("yyyy-MM-dd").print(u)).orElse(Some("n/a"))) - <a href="#" class="delete">删除</a></li>
-      }
-      </ul>
-      }
-      <div>
-        <a href="@routes.Users.showRegistPage">Create</a>
-      </div>
-    </div>
-  </div>
+
+</style>
+
+
+<div class="box">
+	<h1 class="title-content" align="center">用户列表</h1>
+	<div class="login-box">
+			@if(users.isEmpty) {
+	        <p>当前没有任何用户.</p>
+			} else {
+				<table align="center" class="gridtable">
+				<tr>
+					<th>用户名</th>
+					<th>email</th>
+					<th>最后修改时间</th>
+					<th>编辑</th>
+					<th>删除</th>
+				</tr>
+				@users.map { user =>
+					<tr>
+						<td>@user.username</td>
+						<td>@user.email</td>
+						<td>@user.updatetime.map(u => org.joda.time.format.DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss").print(u)).orElse(Some("n/a"))</td>
+						<td><a href="#" class="edit">编辑</a></td>
+						<td><a href="#" class="delete">删除</a></td>
+					</tr>
+				}
+				</table>
+		    }
+	</div>
+</div>
 }

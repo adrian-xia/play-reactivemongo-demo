@@ -86,7 +86,7 @@ class Users @Inject()(
         id = user.id.orElse(Some(UUID.randomUUID().toString)),
         createtime = Some(new DateTime()),
         updatetime = Some(new DateTime()))
-      ).map(_ => Redirect(routes.Users.listUsers))
+      ).map(_ => Redirect(routes.Users.showLoginPage))
     )
   }
   
