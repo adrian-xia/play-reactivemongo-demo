@@ -23,6 +23,7 @@ import play.modules.reactivemongo.json._, ImplicitBSONHandlers._
 import play.modules.reactivemongo.json.collection._
 
 import models.User, User._
+import models.LoginForm
 
 /**
  * @author adrian
@@ -43,6 +44,14 @@ class Users @Inject()(
     case index =>
       Logger.info(s"Checked index, result is $index")
   }
+  
+  def showLoginPage = Action { request =>
+    implicit val messages = messagesApi.preferred(request)
+
+    Ok(views.html.login(LoginForm.form))
+  }
+  
+  def loginSubmit = TODO
   
   def listUsers = Action.async { implicit request =>
     
@@ -72,7 +81,7 @@ class Users @Inject()(
       errors => Future.successful(
         Ok(views.html.regist(errors))),
 
-      // if no error, then insert the article into the 'articles' collection
+      // 没有验证错误，插入注册用户
       user => collection.insert(user.copy(
         id = user.id.orElse(Some(UUID.randomUUID().toString)),
         createtime = Some(new DateTime()),
