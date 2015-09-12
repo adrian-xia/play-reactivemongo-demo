@@ -45,14 +45,11 @@ class Users @Inject()(
   }
   
   def listUsers = Action.async { implicit request =>
-    // get a sort document (see getSort method for more information)
     
-    // build a selection document with an empty query and a sort subdocument ('$orderby')
     val query = Json.obj("$query" -> Json.obj())
 
-    // the cursor of documents
     val found = collection.find(query).cursor[User]
-    // build (asynchronously) a list containing all the articles
+    
     found.collect[List]().map { users =>
       Ok(views.html.listUsers(users))
     }.recover {
@@ -68,6 +65,20 @@ class Users @Inject()(
     Ok(views.html.regist(User.form))
   }
   
-  def registSubmit = TODO
+  def registSubmit = Action.async { implicit request =>
+    implicit val messages = messagesApi.preferred(request)
+
+    User.form.bindFromRequest.fold(
+      errors => Future.successful(
+        Ok(views.html.regist(errors))),
+
+      // if no error, then insert the article into the 'articles' collection
+      user => collection.insert(user.copy(
+        id = user.id.orElse(Some(UUID.randomUUID().toString)),
+        createtime = Some(new DateTime()),
+        updatetime = Some(new DateTime()))
+      ).map(_ => Redirect(routes.Users.listUsers))
+    )
+  }
   
 }
