@@ -2,6 +2,8 @@
 
 @main("Welcome to Play 2.0") {
 	
+<script src="@routes.Assets.versioned("javascripts/main.js")" type="text/javascript"></script>
+
 <style type="text/css">
 table.gridtable {
 	font-family: verdana,arial,sans-serif;
@@ -49,8 +51,8 @@ table.gridtable td {
 						<td>@user.username</td>
 						<td>@user.email</td>
 						<td>@user.updatetime.map(u => org.joda.time.format.DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss").print(u)).orElse(Some("n/a"))</td>
-						<td><a href="#" class="edit">编辑</a></td>
-						<td><a href="#" class="delete">删除</a></td>
+						<td><a href="@routes.Users.showEditPage(user.id.get)" class="edit">编辑</a></td>
+						<td><a href="@routes.Users.deleteUser(user.id.get)" class="delete">删除</a></td>
 					</tr>
 				}
 				</table>

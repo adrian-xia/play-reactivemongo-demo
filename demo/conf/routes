@@ -8,6 +8,8 @@ POST	/users/loginsubmit			controllers.Users.loginSubmit
 GET		/users/listusers			controllers.Users.listUsers
 GET     /users/regist               controllers.Users.showRegistPage
 POST	/users/registsubmit			controllers.Users.registSubmit
+DELETE  /users/:id           		controllers.Users.deleteUser(id)
+GET     /users/:id              	controllers.Users.showEditPage(id)
 
 
 
