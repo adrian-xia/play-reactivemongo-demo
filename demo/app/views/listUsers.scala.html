@@ -1,0 +1,22 @@
+@(users: List[models.User])
+
+@main("Welcome to Play 2.0") {
+  <div class="row">
+    <div class="span12">
+      <h2>Available articles</h2>
+
+      @if(users.isEmpty) {
+        <p>当前没有任何用户.</p>
+      } else {
+      <ul>
+      @users.map { user =>
+        <li><a href="#">@user.username</a> <em>by @user.email</em> (last modified : @user.updatetime.map(u => org.joda.time.format.DateTimeFormat.forPattern("yyyy-MM-dd").print(u)).orElse(Some("n/a"))) - <a href="#" class="delete">删除</a></li>
+      }
+      </ul>
+      }
+      <div>
+        <a href="@routes.Users.showRegistPage">Create</a>
+      </div>
+    </div>
+  </div>
+}
